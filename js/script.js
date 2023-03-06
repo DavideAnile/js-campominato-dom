@@ -46,9 +46,9 @@ const gridContainerEl = document.getElementById("grid-container")
 const opzioniEl = document.getElementById("opzioni")
 const presentazioneEl = document.getElementById("presentazione")
 let sottotitolo = document.createElement("div")
-let bombe;
 let cellNumber;
 let squareDimensions;
+
 
 
 
@@ -90,16 +90,17 @@ presentazioneEl.style.display = "none"
         
     }
 
+// Genero i numeri bomba a secondo del numero di celle scelto    
     generateBombs(cellNumber);
     console.log(bombe)
-    let contatore = 0
-
- // mostro titolo e sottotitolo   
+    
+    // mostro titolo e sottotitolo   
     sottotitolo.classList.add("sottotitolo")
     titolo.append(sottotitolo)
     titolo.style.display = "flex"
-
-
+    
+//inizializzo contatore a zero (serve per tenere conto delle caselle "non bombe" cliccate)    
+let contatore = 0
 
 // - creo un ciclo for per generare quadrati all'interno della griglia      
 for(let i = 1; i <= cellNumber;i++){
@@ -109,49 +110,76 @@ for(let i = 1; i <= cellNumber;i++){
     
     gridContainerEl.append(newEl)
 
-    
+   
 //- aggiungo evento click al quadrato creato    
     newEl.addEventListener("click", function(){
+
+// ? SE  il valore del contatore è uguale a "(numero celle - numero bombe) - 1"       
+        if(contatore == (cellNumber - 16) - 1){
+            sottotitolo.innerText = "COMPLIMENTI HAI VINTO !"
+            sottotitolo.style.color = "green"
+            newEl.style.backgroundColor = "green"
+
+//  °l'utente non può cliccare più niente all'interno della grid            
+            gridContainerEl.style.pointerEvents = "none"
         
-            if(contatore == (cellNumber - 16) - 1){
-                sottotitolo.innerText = "COMPLIMENTI HAI VINTO !"
-                newEl.style.backgroundColor = "green"
-                gridContainerEl.style.pointerEvents = "none"
-            }
+// ALTRIMENTI SE la casella cliccata non è contenuta nell'array di numeri bomba,il quadrato ottiene sfondo azzurro 
+        } else if(!bombe.includes(i)){
+                                
+                newEl.classList.add("lightblue")
+                newEl.style.pointerEvents = "none"
+                contatore++
+        
+// ALTRIMENTI SE il la casella cliccata è inclusa nell'array di numeri bomba            
+        } else if(bombe.includes(i)){
+
+            //  creo una varibile prendendo tutti i quadrati generati nel DOM              
+            let bombSquare = document.querySelectorAll(".square")
+
+            // creo un ciclo for                  
+                 for(let k = 0;k < bombSquare.length; k++){
+                     
+            // se la variabile k è inclusa dentro l'array di bombe, il quadrato ottiene lo sfondo rosso                        
+                        if(bombe.includes(k + 1)){
+
+                            bombSquare[k].classList.add("red")
+                        }
+                    }
+             
+            gridContainerEl.style.pointerEvents = "none"
+            sottotitolo.innerText = `HAI PERSO, IL TUO PUNTEGGIO E' : ${contatore} 
+                                    PREMI IL TASTO PLAY PER RICOMINCIARE`;
+                
+            };
+                                    
+        })
+    }
+                                                            
+});
+
+
+                    
+                
+                
+
+                                                
+       
+       
+                                                    
+                
        
 
-            else if(bombe.includes(i)){
-                
-                newEl.classList.add("red")
-                gridContainerEl.style.pointerEvents = "none"
-                sottotitolo.innerText = `HAI PERSO, IL TUO PUNTEGGIO E' : ${contatore} 
-                
-                                        PREMI IL TASTO PLAY PER RICOMINCIARE`;
+            
                 
                 
-            } else if(!bombe.includes(i)){
-    
-                //°colora quella cella di azzurro aggiungendo una classe con metodo .toggle        
-                        newEl.classList.add("lightblue")
-                        newEl.style.pointerEvents = "none"
-                //°stampa in console il numero della cella cliccata        
-                        contatore++
-                        
-            }
-                    
-                   
-        
         
 
         
-});
       
 
 
 
-}
 
-});
     
     
    
@@ -193,11 +221,12 @@ function generateBombs (difficoltà){
     while(bombe.length < 16){
     
         let numeroBomba = Math.floor(Math.random() * difficoltà + 1);
+        
         if(!bombe.includes(numeroBomba)){
 
             bombe.push(numeroBomba);
         }
-    }
+    } return bombe
 }
 
     
